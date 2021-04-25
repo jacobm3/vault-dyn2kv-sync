@@ -1,11 +1,29 @@
 # vault-dyn2kv-sync
 POC shell script that syncs dynamic creds to KV paths. Allows easier migration from static to dynamic credentials.
 
-# KV Setup
+# Vault KV Setup
 
+Enable KV secrets engine and put a static secret in.
 ```
 vault secrets enable -version=2 secret
 vault kv put secret/app1/db1 username=foo password=bar
+```
+
+```
+$ vault kv get secret/app1/db1
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2021-04-25T02:09:43.5074973Z
+deletion_time    n/a
+destroyed        false
+version          4
+
+====== Data ======
+Key         Value
+---         -----
+password    bar
+username    foo
 ```
 
 # DB Setup
@@ -51,6 +69,9 @@ CREATE TABLE IF NOT EXISTS users (
 
 ```
 
+# Vault DB secrets engine setup
+
+Enable DB secrets engine, configure a role, and configure a policy.
 ```
 echo "Enabling database secrets engine"
 vault secrets enable database
@@ -77,5 +98,106 @@ path "database/creds/db1-5s" {
   capabilities = ["read"]
 }
 EOF
+
+```
+
+Test secrets engine.
+```
+$ vault read database/creds/db1-5s
+Key                Value
+---                -----
+lease_id           database/creds/db1-5s/HLhosCjh5avNYTp08rP75A06
+lease_duration     5s
+lease_renewable    true
+password           VfdbP-9-qzahR3TeNyc7
+username           v_token_db1-5s_YRAMUuTtLeX1clmzz
+
+```
+
+# sync.sh setup
+Edit paths in sync.sh to reflect the DB dynamic creds and KV paths to use in your environment.
+
+```
+$ head sync.sh
+#!/bin/bash
+
+# Path to read dynamic DB credentials from
+srcpath=database/creds/db1-5s
+
+# KV path to write DB credentials to
+dstpath=secret/app1/db1
+```
+
+# Execute sync script and watch creds sync in KV path
+Execute sync script and watch creds sync in KV path
+
+```
+$ ./sync.sh
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2021-04-25T02:13:59.5913811Z
+deletion_time    n/a
+destroyed        false
+version          5
+
+====== Data ======
+Key         Value
+---         -----
+lease_id    database/creds/db1-5s/iWMRCa948XdI2GNeLDpbfUPo
+password    E9s6HyoM-217mQlOzc05
+username    v_token_db1-5s_pZPbhkJNYKreqbiOH
+warnings    null
+
+$ vault kv get secret/app1/db1
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2021-04-25T02:13:59.5913811Z
+deletion_time    n/a
+destroyed        false
+version          5
+
+====== Data ======
+Key         Value
+---         -----
+lease_id    database/creds/db1-5s/iWMRCa948XdI2GNeLDpbfUPo
+password    E9s6HyoM-217mQlOzc05
+username    v_token_db1-5s_pZPbhkJNYKreqbiOH
+warnings    null
+
+$ ./sync.sh
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2021-04-25T02:14:28.3222738Z
+deletion_time    n/a
+destroyed        false
+version          6
+
+====== Data ======
+Key         Value
+---         -----
+lease_id    database/creds/db1-5s/yeT2pbN0yRJ8qTPzdILhDRtN
+password    RMPJ8iIW-UpEifpJkxRa
+username    v_token_db1-5s_AsMBZGpZnBbjbFVA2
+warnings    null
+
+$ vault kv get secret/app1/db1
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2021-04-25T02:14:28.3222738Z
+deletion_time    n/a
+destroyed        false
+version          6
+
+====== Data ======
+Key         Value
+---         -----
+lease_id    database/creds/db1-5s/yeT2pbN0yRJ8qTPzdILhDRtN
+password    RMPJ8iIW-UpEifpJkxRa
+username    v_token_db1-5s_AsMBZGpZnBbjbFVA2
+warnings    null
 
 ```
