@@ -1,7 +1,7 @@
 # vault-dyn2kv-sync
 POC shell script that syncs dynamic creds to KV paths. Allows easier migration from static to dynamic credentials.
 
-# Vault KV Setup
+## Vault KV Setup
 
 Enable KV secrets engine and put a static secret in.
 ```
@@ -26,7 +26,7 @@ password    bar
 username    foo
 ```
 
-# DB Setup
+## DB Setup
 
 Using the Mysql plugin with the database secrets engine in this example.
 
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 ```
 
-# Vault DB secrets engine setup
+## Vault DB secrets engine setup
 
 Enable DB secrets engine, configure a role, and configure a policy.
 ```
@@ -114,7 +114,7 @@ username           v_token_db1-5s_YRAMUuTtLeX1clmzz
 
 ```
 
-# sync.sh setup
+## sync.sh setup
 Edit paths in sync.sh to reflect the DB dynamic creds and KV paths to use in your environment.
 
 ```
@@ -128,7 +128,7 @@ srcpath=database/creds/db1-5s
 dstpath=secret/app1/db1
 ```
 
-# Execute sync script and watch creds sync in KV path
+## Execute sync script and watch creds sync in KV path
 Execute sync script and watch creds sync in KV path
 
 ```
