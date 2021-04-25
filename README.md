@@ -3,7 +3,7 @@ POC shell script that syncs dynamic creds to KV paths. Allows easier migration f
 
 # KV Setup
 
-`
+```
 vault secrets enable -version=2 secret
 vault kv put secret/app1/db1-5s username=foo password=bar
-`
+```
