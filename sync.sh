@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Set VAULT_ADDR and VAULT_TOKEN in the environment to connect to the Vault server
+
 # Path to read dynamic DB credentials from
 srcpath=database/creds/db1-5s
 
