@@ -1,5 +1,7 @@
 # vault-dyn2kv-sync
-POC shell script that syncs dynamic creds to KV paths. Allows easier migration from static to dynamic credentials.
+POC script that syncs Vault dynamic creds to KV paths, so the Tenable integration with Vault can leverage dynamic creds without requiring Tenable updates. Allows easier migration from static to dynamic credentials.
+
+![diagram](diagram.png)
 
 ## Vault KV Setup
 
